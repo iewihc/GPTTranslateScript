@@ -29,7 +29,7 @@ const defaultManualSubmitText = [
 第三個部份請你幫我整理文章中的專有名詞，也應包括英文和繁體中文，用逗號分隔。比如說：蘋果 (Apple), 香蕉 (Banana)的格式。
 文章內容如下:
 {replace_text} ` },
-    { text: 'PARAPHRASE', template: `請你幫我使用英文Paraphrase這段句子，並說明您修改的內容: {{replace_text}} `},
+    { text: 'PARAPHRASE', template: `請你幫我使用英文Paraphrase這段句子，並使用項目符號說明您修改的內容: {{replace_text}} `},
     {
         text: 'DICTIONARY', template: `請您幫我列出這個單字的中文和英文並且 1. 該單字的兩個例句，例句需要包含繁體中文和英文 2. 該單字的五個vocabulary collocations用法 2. 該單字不同詞性，包含其名詞、代名詞、形容詞、動詞、副詞  3. 該單字同義詞和反義詞，單字為：{replace_text} `
     },
