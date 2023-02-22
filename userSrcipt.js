@@ -39,109 +39,14 @@ const defaultManualSubmitText = [
 ];
 
 
-const addButtonsToSendDefaultMessage = () => {
-    let globalButtons = [];
-    let buttonsArea = null;
-
-
-    const main = document.querySelector("body");
-    const obs = new MutationObserver(() => {
-
-        // 尋找聊天記錄的最後一筆，用來插入按鈕
-        const talkBlocks = document.querySelectorAll(
-            ".text-base.gap-4.md\\:gap-6.m-auto.md\\:max-w-2xl.lg\\:max-w-2xl.xl\\:max-w-3xl.p-4.md\\:py-6.flex.lg\\:px-0:not(.custom-buttons-area)"
-        );
-        if (!talkBlocks || !talkBlocks.length) {
-            return;
-        }
-
-        // 要被插入按鈕的區塊
-        const talkBlockToInsertButtons = talkBlocks[talkBlocks.length - 1];
-
-        // 先停止觀察，避免自訂畫面變更被觀察到
-        stop();
-
-        // 先將原來動態加入的內容移除
-
-        // remove custom buttons
-        globalButtons.forEach((button) => button.remove());
-        globalButtons = [];
-
-        // remove buttons area
-        if (buttonsArea) {
-            buttonsArea.remove();
-        }
-
-        // 重新將按鈕區和按鈕移除
-
-        // create a new buttons area
-        buttonsArea = document.createElement("div");
-        buttonsArea.classList =
-            "custom-buttons-area text-base m-auto md:max-w-2xl lg:max-w-2xl xl:max-w-3xl p-4 md:py-6 flex lg:px-0";
-        buttonsArea.style.overflowY = "auto";
-        buttonsArea.style.display = "flex";
-        buttonsArea.style.flexWrap = "wrap";
-        buttonsArea.style.paddingTop = 0;
-        buttonsArea.style.paddingLeft = "calc(30px + 0.75rem)";
-        talkBlockToInsertButtons.after(buttonsArea);
-
-        // add buttons
-        defaultManualSubmitText.forEach((item) => {
-
-            let lastText = talkBlockToInsertButtons.innerText;
-
-            const isPunctuation = (str) => {
-                const punctuationRegex = /^(?![，,：:])[\p{P}\p{S}]$/u;
-                return punctuationRegex.test(str);
-            }
-
-            // 最後一個字元如果是標點符號，就不要顯示「繼續」
-            if (isPunctuation(lastText.charAt(lastText.length - 1)) && item.text == '繼續') {
-                return;
-            }
-
-            const button = document.createElement("button");
-            button.style.border = "1px solid #d1d5db";
-            button.style.borderRadius = "5px";
-            button.style.padding = "0.5rem 1rem";
-            button.style.margin = "0.5rem";
-
-            button.innerText = item.text;
-            button.addEventListener("click", () => {
-                fillAndSubmitText(item.value);
-            });
-
-            buttonsArea.append(button);
-            globalButtons.push(button);
-        });
-
-        // 重新開始觀察
-        start();
-    });
-
-    const start = () => {
-        obs.observe(main.parentElement, {
-            childList: true,
-            attributes: true,
-            subtree: true,
-        });
-    };
-    const stop = () => {
-        obs.disconnect();
-    };
-
-    start();
-};
-
 const addTextToTextarea = (test) => {
     const textarea = document.querySelector("textarea");
     const text = textarea.value;
     const newText = test.replace('{replace_text}', text);
-    // textarea.value = newText;
     fillAndSubmitText(newText);
 };
 
-const addBottomButtonAndReformate = ()=>{
+const addBottomButtonAndFormatting = ()=>{
     setTimeout(function() {
         let btnDivContainer = document.createElement('div');
 
@@ -176,5 +81,5 @@ const addBottomButtonAndReformate = ()=>{
 
 (function () {
     "use strict";
-    addBottomButtonAndReformate();
+    addBottomButtonAndFormatting();
 })();
