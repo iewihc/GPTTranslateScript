@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name         ChatGPT: 自動填入提示文字並自動送出
-// @description  自動填入 ChatGPT 提示文字並可設定自動送出提問
-// @version      3.1.4
+// @name         ChatGPT: 英文翻譯工具
+// @description  自動修改textarea後送出、論文翻譯、語句更改、文法檢查、字典
+// @version      1.0.0
 // @source       https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
 // @namespace    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
 // @website      https://fullstackladder.dev/
-// @author       Mike Huang
+// @author       Chi-Wei Lin
 // @run-at       document-end
 // @license      MIT
 // @match        *://chat.openai.com/chat*
