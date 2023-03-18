@@ -5,7 +5,7 @@
 // @source       https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
 // @namespace    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
 // @updateURL    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
-// @downloadURL    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
+// @downloadURL  https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
 // @require      https://raw.githubusercontent.com/iewihc/GPTTranslateScript/main/userSrcipt.js
 // @website      https://fullstackladder.dev/
 // @author       Chi-Wei Lin
