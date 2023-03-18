@@ -102,6 +102,165 @@ const menuOptions = [
     },
 ]
 
+//
+const defaultManualSubmitText = [
+    // continue
+    { text: "繼續", value: "請從中斷的地方繼續" },
+    { text: "換一個", value: "我不喜歡這個用法，請換一個用法"},
+    { text: "斷句", value: "這個句子太長了，請幫我斷句" }
+];
+
+const autoFillFromSegment = () => {
+    if (!location.hash) {
+        return;
+    }
+
+    // 解析 hash 中的查詢字串並取得所需的參數
+    const params = new URLSearchParams(location.hash.substring(1));
+
+    // 解析參數
+    const prompt = params
+        .get("prompt")
+        ?.replace(/\r/g, "")
+        .replace(/\s+$/g, "")
+        .replace(/\n{3,}/gs, "\n\n")
+        .replace(/^\s+|\s+$/gs, "");
+    const autoSubmit = params.get("autoSubmit");
+
+    // 沒有 prompt 就不用作任何事情
+    if (!prompt) {
+        return;
+    }
+
+    /**
+     * 等待 focus 到訊息輸入框就開始初始化功能
+     */
+    const it = setInterval(() => {
+        const textarea = document.activeElement;
+        if (
+            textarea.tagName === "TEXTAREA" &&
+            textarea.nextSibling.tagName === "BUTTON"
+        ) {
+            // 預設的送出按鈕
+            const button = textarea.parentElement.querySelector("button:last-child");
+
+            // 填入 prompt
+            textarea.value = prompt;
+            textarea.dispatchEvent(new Event("input", { bubbles: true }));
+            textarea.focus();
+            textarea.setSelectionRange(textarea.value.length, textarea.value.length); //將選擇範圍設定為文本的末尾
+            textarea.scrollTop = textarea.scrollHeight; // 自動捲動到最下方
+
+            // auto submit
+            if (autoSubmit == "1" || autoSubmit == "true") {
+                button.click();
+            }
+
+            // 移掉 segment 的參數
+            history.replaceState(
+                {},
+                document.title,
+                window.location.pathname + window.location.search
+            );
+
+            clearInterval(it);
+        }
+    }, 60);
+};
+
+const addButtonsToSendDefaultMessage = () => {
+    let globalButtons = [];
+    let buttonsArea = null;
+
+    const main = document.querySelector("body");
+    const obs = new MutationObserver(() => {
+        // 尋找聊天記錄的最後一筆，用來插入按鈕
+        const talkBlocks = document.querySelectorAll(
+            ".text-base.gap-4.md\\:gap-6.m-auto.md\\:max-w-2xl.lg\\:max-w-2xl.xl\\:max-w-3xl.p-4.md\\:py-6.flex.lg\\:px-0:not(.custom-buttons-area)"
+        );
+        if (!talkBlocks || !talkBlocks.length) {
+            return;
+        }
+
+        // 要被插入按鈕的區塊
+        const talkBlockToInsertButtons = talkBlocks[talkBlocks.length - 1];
+
+        // 先停止觀察，避免自訂畫面變更被觀察到
+        stop();
+
+        // 先將原來動態加入的內容移除
+
+        // remove custom buttons
+        globalButtons.forEach((button) => button.remove());
+        globalButtons = [];
+
+        // remove buttons area
+        if (buttonsArea) {
+            buttonsArea.remove();
+        }
+
+        // 重新將按鈕區和按鈕移除
+
+        // create a new buttons area
+        buttonsArea = document.createElement("div");
+        buttonsArea.classList =
+            "custom-buttons-area text-base m-auto md:max-w-2xl lg:max-w-2xl xl:max-w-3xl p-4 md:py-6 flex lg:px-0";
+        buttonsArea.style.overflowY = "auto";
+        buttonsArea.style.display = "flex";
+        buttonsArea.style.flexWrap = "wrap";
+        buttonsArea.style.paddingTop = 0;
+        buttonsArea.style.paddingLeft = "calc(30px + 0.75rem)";
+        talkBlockToInsertButtons.after(buttonsArea);
+
+        // add buttons
+        defaultManualSubmitText.forEach((item) => {
+
+            let lastText = talkBlockToInsertButtons.innerText;
+
+            const isPunctuation = (str) => {
+                const punctuationRegex = /^(?![，,：:])[\p{P}\p{S}]$/u;
+                return punctuationRegex.test(str);
+            }
+
+            // 最後一個字元如果是標點符號，就不要顯示「繼續」
+            if (isPunctuation(lastText.charAt(lastText.length - 1)) && item.text == '繼續') {
+                return;
+            }
+
+            const button = document.createElement("button");
+            button.style.border = "1px solid #d1d5db";
+            button.style.borderRadius = "5px";
+            button.style.padding = "0.5rem 1rem";
+            button.style.margin = "0.5rem";
+
+            button.innerText = item.text;
+            button.addEventListener("click", () => {
+                fillAndSubmitText(item.value);
+            });
+
+            buttonsArea.append(button);
+            globalButtons.push(button);
+        });
+
+        // 重新開始觀察
+        start();
+    });
+
+    const start = () => {
+        obs.observe(main.parentElement, {
+            childList: true,
+            attributes: true,
+            subtree: true,
+        });
+    };
+    const stop = () => {
+        obs.disconnect();
+    };
+
+    start();
+};
+//...
+
 const setAutoFill = async () => {
     // 隔一秒再處理，避免畫面還沒準備好
     setTimeout(async () => {
@@ -419,6 +578,8 @@ const addSideButton = () => {
 
     }, 5000);
 
+    autoFillFromSegment();
+    addButtonsToSendDefaultMessage();
     addBottomButtonAndFormatting();
     addSideButton();
 })();
