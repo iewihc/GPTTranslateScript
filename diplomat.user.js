@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT: 外交官
 // @description  打入斜線「/」可以產生出預設的右上方指令template; 下方按鈕可以協助prompt生成; 註冊全局點擊右鍵可以的總結文章、翻譯文本prompt
-// @version      3.0.0
+// @version      3.1.0
 // @source       https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
 // @namespace    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
 // @updateURL    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
@@ -102,7 +102,6 @@ const menuOptions = [
     },
 ]
 
-//
 const afterTextOptions = [
     // continue
     { text: "繼續", value: "請從中斷的地方繼續" },
@@ -201,6 +200,7 @@ const addAfterTextButtonsToSendDefaultMessage = () => {
 
     start();
 };
+
 //
 
 const setAutoFill = async () => {
@@ -315,7 +315,6 @@ const addBottomButtonAndFormatting = () => {
     observer.observe(document.body, {childList: true});
 
 };
-
 
 const addSideButton = () => {
     const textarea = document.querySelector("textarea");
@@ -520,7 +519,6 @@ const addSideButton = () => {
 
     }, 5000);
 
-    // autoFillFromSegment();
     addAfterTextButtonsToSendDefaultMessage();
     addBottomButtonAndFormatting();
     addSideButton();
