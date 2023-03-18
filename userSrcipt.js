@@ -13,7 +13,7 @@
 // @license      MIT
 // @match        *://chat.openai.com/chat*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
-// ==/UserScript==
+// ==UserScript==
 
 
 const defaultBottomOptions = [
