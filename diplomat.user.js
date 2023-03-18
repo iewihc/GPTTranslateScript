@@ -1,17 +1,18 @@
 // ==UserScript==
-// @name         ChatGPT: 英文翻譯工具
-// @description  自動修改textarea後送出、論文翻譯、語句更改、文法檢查、字典
-// @version      2.1.0
+// @name         ChatGPT: 外交官
+// @description  打入斜線「/」可以產生出預設的右上方指令template; 下方按鈕可以協助prompt生成; 註冊全局點擊右鍵可以的總結文章、翻譯文本prompt
+// @version      3.0.0
 // @source       https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
 // @namespace    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
 // @updateURL    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
-// @downloadURL    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
+// @downloadURL  https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
 // @require      https://raw.githubusercontent.com/iewihc/GPTTranslateScript/main/userSrcipt.js
 // @website      https://fullstackladder.dev/
 // @author       Chi-Wei Lin
 // @run-at       document-end
 // @license      MIT
-// @match        *://chat.openai.com/chat*
+// @match        http://*/*
+// @match        https://*/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @grant        GM.setValue
 // @grant        GM.getValue
@@ -57,58 +58,70 @@ const defaultBottomOptions = [
         template: `Please ignore all the instructions you received previously. 請幫此段 {replace_text} 1. 翻譯成繁體中文 2. 請修正這段英文句子的文法錯誤 3.使用項目符號說明您修改的內容 4. 請使用英語，將此句翻寫為更加學術`
     },
     {
-        text: 'GRAMMAR CHECK',
+        text: 'GRAMMAR TABLE',
         template: `Do a grammar check, Spelling check, Writing suggestions, Expression check and Translation check, use a table to highlight the wrong sentences and also provide a traditional-Chinese suggested correction. :「{replace_text}」`
-    },
-    // {
-    //     text: 'TESTCASE', template: `你現在是一個程式語言專家，我有一段程式碼 {{replace_text}} ，請幫我寫一個測試，請至少提供五個測試案例，同時要包含到極端的狀況，讓我能夠確定這段程式碼的輸出是正確的。`,
-    // },
-    // {
-    //     text: 'REFACTOR', template: `你現在是一個 Clean Code 專家，我有以下的程式碼，請用更乾淨簡潔的方式改寫，讓我的同事們可以更容易維護程式碼。另外，也解釋為什麼你要這樣重構，讓我能把重構的方式的說明加到 Pull Request 當中。 {{replace_text}`,
-    // }
+    }
 ];
 
 const commandOptions = [
     {
-        cmd: "/Performance", prompt: `#zh-TW Please ignore all previous instructions. From now on, you act as an system architect experts.  Please help me optimize the performance of the code:`
+        cmd: "/PERFORMANCE",
+        prompt: `#zh-TW Please ignore all previous instructions. From now on, you act as an system architect experts.  Please help me optimize the performance of the code:`
     },
     {
-        cmd: "/DesignPrinciples", prompt: `#zh-TW Please ignore all previous instructions. From now on, you act as an system architect experts.  Please help me optimize this code based on the famous 23 design principles and let me know which design principle you used: `
+        cmd: "/D-PRINCIPLES",
+        prompt: `#zh-TW Please ignore all previous instructions. From now on, you act as an system architect experts.  Please help me optimize this code based on the famous 23 design principles and let me know which design principle you used: `
     },
     {
-        cmd: "/Unittest", prompt: `#zh-TW Please ignore all previous instructions. From now on, you are now a programming language expert. Please help me write a test project by using NUnit. Please provide at least two test cases to ensure that the output of this code is correct: `
+        cmd: "/UNITTEST",
+        prompt: `#zh-TW Please ignore all previous instructions. From now on, you are now a programming language expert. Please help me write a test project by using NUnit. Please provide at least two test cases to ensure that the output of this code is correct: `
     },
     {
-        cmd: "/Refactor", prompt: `#zh-TW Please ignore all previous instructions. From now on, you act as an clean code experts. Please rewrite it in a cleaner and simpler way so that my colleagues can maintain the code more easily. Also, please explain in one simple sentence why you are refactoring in this way: `
+        cmd: "/REFACTOR",
+        prompt: `#zh-TW Please ignore all previous instructions. From now on, you act as an clean code experts. Please rewrite it in a cleaner and simpler way so that my colleagues can maintain the code more easily. Also, please explain in one simple sentence why you are refactoring in this way: `
     },
     {
-        cmd: "/SUGGESTION", prompt: `#zh-TW Please ignore all previous instructions. From now on, you act as a senior coder expert. Pose as a specialist in c# who can fluently speak. Evaluate the below-metioned c# code and furnish some suggestion with regards to better Readability, Maintainability and performance: `
+        cmd: "/SUGGESTION",
+        prompt: `#zh-TW Please ignore all previous instructions. From now on, you act as a senior coder expert. Pose as a specialist in c# who can fluently speak. Evaluate the below-metioned c# code and furnish some suggestion with regards to better Readability, Maintainability and performance: `
     }
 
 ]
 
-// dictionary
-const promptDictionary = "請您幫我列出此單字的中文和英文以其他的詞根詞綴解釋 1. 該單字的兩個例句，例句需要包含繁體中文和英文 2. 該單字的五個vocabulary collocations用法 2. 該單字不同詞性，包含其名詞、代名詞、形容詞、動詞、副詞  3. 該單字同義詞和反義詞，單字為：";
+const menuOptions = [
+    {
+        cmd: "TRANSLATE",
+        prompt: `請您幫我以下單字的中文和英文以其他的詞根詞綴解釋 1. 該單字的兩個例句，例句需要包含繁體中文和英文 2. 該單字的五個vocabulary collocations用法 2. 該單字不同詞性，包含其名詞、代名詞、形容詞、動詞、副詞  3. 該單字同義詞和反義詞，單字為：`
+    },
+    {
+        text: '翻譯文本',
+        template: `#zh-TW 請你繼續根以下內容，1. 翻譯為流暢的繁體中文，2. 幫我使用一句話概述 ，內容為：`
+    },
+    {
+        text: '項目摘要',
+        template: `#zh-TW 請你繼續根以下內容，使用項目符號幫我列出繁體中文和英文的摘要，中文與英文麻煩幫我同時列在同一個點上，其格式為：中文句子 (English Sentence)，並在標題輸入「項目摘要」。 內容為：`
+    },
+]
+
 const setAutoFill = async () => {
     // 隔一秒再處理，避免畫面還沒準備好
     setTimeout(async () => {
-      const prompt = await GM.getValue("prompt", "");
-      if (prompt) {
-        // 填入 prompt
-        const textarea = document.querySelector("textarea[data-id=root]");
-        textarea.value = prompt;
-        textarea.dispatchEvent(new Event("input", { bubbles: true }));
-  
-        const button = textarea.parentElement.querySelector(
-          "button.absolute.p-1.rounded-md.text-gray-500.bottom-1\\.5.right-1.md\\:bottom-2\\.5.md\\:right-2.hover\\:bg-gray-100.dark\\:hover\\:text-gray-400.dark\\:hover\\:bg-gray-900.disabled\\:hover\\:bg-transparent.dark\\:disabled\\:hover\\:bg-transparent"
-        );
-        button.click();
-  
-        // 清除暫存的 prompt
-        await GM.setValue("prompt", "");
-      }
+        const prompt = await GM.getValue("prompt", "");
+        if (prompt) {
+            // 填入 prompt
+            const textarea = document.querySelector("textarea[data-id=root]");
+            textarea.value = prompt;
+            textarea.dispatchEvent(new Event("input", {bubbles: true}));
+
+            const button = textarea.parentElement.querySelector(
+                "button.absolute.p-1.rounded-md.text-gray-500.bottom-1\\.5.right-1.md\\:bottom-2\\.5.md\\:right-2.hover\\:bg-gray-100.dark\\:hover\\:text-gray-400.dark\\:hover\\:bg-gray-900.disabled\\:hover\\:bg-transparent.dark\\:disabled\\:hover\\:bg-transparent"
+            );
+            button.click();
+
+            // 清除暫存的 prompt
+            await GM.setValue("prompt", "");
+        }
     }, 1000);
-  };
+};
 
 const openChatGPT = async (basePrompt, text) => {
     // 設定 prompt 並打開 ChatGPT
@@ -117,20 +130,33 @@ const openChatGPT = async (basePrompt, text) => {
     window.open("https://chat.openai.com/chat", "_blank");
 };
 
-const registerDictionary = async () => {
-    GM.registerMenuCommand(
-        "請您幫我列出此單字的中文和英文以其他的詞根詞綴解釋 1. 該單字的兩個例句，例句需要包含繁體中文和英文 2. 該單字的五個vocabulary collocations用法 2. 該單字不同詞性，包含其名詞、代名詞、形容詞、動詞、副詞  3. 該單字同義詞和反義詞，單字為：",
-        async () => {
-        const text = getSelectionText();
-
-        // 有 text 標籤才處理
-        if (text) {
-            openChatGPT(promptBaseTranslateTC, text);
-        }
-        },
-        "t"
-    );
+const getSelectionText = () => {
+    let selectedText = "";
+    if (window.getSelection) {
+        selectedText = window.getSelection().toString();
+    } else if (document.selection && document.selection.type != "Control") {
+        selectedText = document.selection.createRange().text;
+    }
+    return selectedText;
 };
+
+const registerMenu = async () => {
+    for (const {cmd, prompt} of menuOptions) {
+        GM.registerMenuCommand(
+            cmd,
+            async () => {
+                const text = getSelectionText();
+
+                // 有 text 標籤才處理
+                if (text) {
+                    openChatGPT(prompt, text);
+                }
+            },
+            "t"
+        );
+    }
+};
+
 //
 
 
@@ -248,7 +274,6 @@ const addSideButton = () => {
             // 選項被選中
             optionDiv.addEventListener("click", () => {
                 output(cmd);
-                selectedOptionIndex = -1; // 將選中的選項索引重設為-1
                 optionsDiv.remove();
             });
 
@@ -373,9 +398,9 @@ const addSideButton = () => {
     "use strict";
     if (location.hostname === "chat.openai.com") {
         await setAutoFill();
-      } else {
-        await registerDictionary();
-      }
+    } else {
+        await registerMenu();
+    }
 
     // 偵測換頁必須 5 秒後才開始，因為第一次載入時可能會透過 ChatGPTAutoFill.user.js 加入預設表單內容
     setTimeout(() => {
