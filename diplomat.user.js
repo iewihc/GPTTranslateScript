@@ -1,19 +1,19 @@
 // ==UserScript==
 // @name         ChatGPT: 英文翻譯工具
 // @description  自動修改textarea後送出、論文翻譯、語句更改、文法檢查、字典
-// @version      2.3.0
-// @source       https://github.com/iewihc/GPTTranslateScript/blob/main/diplomat.user.js
-// @namespace    https://github.com/iewihc/GPTTranslateScript/blob/main/diplomat.user.js
-// @updateURL    https://github.com/iewihc/GPTTranslateScript/blob/main/diplomat.user.js
-// @downloadURL  https://github.com/iewihc/GPTTranslateScript/blob/main/diplomat.user.js
-// @require      https://github.com/iewihc/GPTTranslateScript/blob/main/diplomat.user.js
+// @version      2.1.0
+// @source       https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
+// @namespace    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
+// @updateURL    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
+// @downloadURL    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
+// @require      https://raw.githubusercontent.com/iewihc/GPTTranslateScript/main/userSrcipt.js
 // @website      https://fullstackladder.dev/
 // @author       Chi-Wei Lin
 // @run-at       document-end
 // @license      MIT
 // @match        *://chat.openai.com/chat*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
-// ==UserScript==
+// ==/UserScript==
 
 
 const defaultBottomOptions = [
