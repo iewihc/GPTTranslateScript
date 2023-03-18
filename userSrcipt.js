@@ -3,8 +3,8 @@
 // @description  自動修改textarea後送出、論文翻譯、語句更改、文法檢查、字典
 // @version      2.1.0
 // @source       https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
-// @namespace    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
-// @updateURL    https://github.com/iewihc/GPTTranslateScript/blob/main/userSrcipt.js
+// @namespace    iewihc
+// @updateURL    https://github.com/iewihc/GPTTranslateScript/edit/main/userSrcipt.js
 // @website      https://fullstackladder.dev/
 // @author       Chi-Wei Lin
 // @run-at       document-end
