@@ -103,72 +103,14 @@ const menuOptions = [
 ]
 
 //
-const defaultManualSubmitText = [
+const afterTextOptions = [
     // continue
     { text: "繼續", value: "請從中斷的地方繼續" },
     { text: "換一個", value: "我不喜歡這個用法，請換一個用法"},
     { text: "斷句", value: "這個句子太長了，請幫我斷句" }
 ];
 
-const autoFillFromSegment = () => {
-    if (!location.hash) {
-        return;
-    }
-
-    // 解析 hash 中的查詢字串並取得所需的參數
-    const params = new URLSearchParams(location.hash.substring(1));
-
-    // 解析參數
-    const prompt = params
-        .get("prompt")
-        ?.replace(/\r/g, "")
-        .replace(/\s+$/g, "")
-        .replace(/\n{3,}/gs, "\n\n")
-        .replace(/^\s+|\s+$/gs, "");
-    const autoSubmit = params.get("autoSubmit");
-
-    // 沒有 prompt 就不用作任何事情
-    if (!prompt) {
-        return;
-    }
-
-    /**
-     * 等待 focus 到訊息輸入框就開始初始化功能
-     */
-    const it = setInterval(() => {
-        const textarea = document.activeElement;
-        if (
-            textarea.tagName === "TEXTAREA" &&
-            textarea.nextSibling.tagName === "BUTTON"
-        ) {
-            // 預設的送出按鈕
-            const button = textarea.parentElement.querySelector("button:last-child");
-
-            // 填入 prompt
-            textarea.value = prompt;
-            textarea.dispatchEvent(new Event("input", { bubbles: true }));
-            textarea.focus();
-            textarea.setSelectionRange(textarea.value.length, textarea.value.length); //將選擇範圍設定為文本的末尾
-            textarea.scrollTop = textarea.scrollHeight; // 自動捲動到最下方
-
-            // auto submit
-            if (autoSubmit == "1" || autoSubmit == "true") {
-                button.click();
-            }
-
-            // 移掉 segment 的參數
-            history.replaceState(
-                {},
-                document.title,
-                window.location.pathname + window.location.search
-            );
-
-            clearInterval(it);
-        }
-    }, 60);
-};
-
-const addButtonsToSendDefaultMessage = () => {
+const addAfterTextButtonsToSendDefaultMessage = () => {
     let globalButtons = [];
     let buttonsArea = null;
 
@@ -213,7 +155,7 @@ const addButtonsToSendDefaultMessage = () => {
         talkBlockToInsertButtons.after(buttonsArea);
 
         // add buttons
-        defaultManualSubmitText.forEach((item) => {
+        afterTextOptions.forEach((item) => {
 
             let lastText = talkBlockToInsertButtons.innerText;
 
@@ -259,7 +201,7 @@ const addButtonsToSendDefaultMessage = () => {
 
     start();
 };
-//...
+//
 
 const setAutoFill = async () => {
     // 隔一秒再處理，避免畫面還沒準備好
@@ -578,8 +520,8 @@ const addSideButton = () => {
 
     }, 5000);
 
-    autoFillFromSegment();
-    addButtonsToSendDefaultMessage();
+    // autoFillFromSegment();
+    addAfterTextButtonsToSendDefaultMessage();
     addBottomButtonAndFormatting();
     addSideButton();
 })();
