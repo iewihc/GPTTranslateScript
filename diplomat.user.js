@@ -13,6 +13,9 @@
 // @license      MIT
 // @match        *://chat.openai.com/chat*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
+// @grant        GM.setValue
+// @grant        GM.getValue
+// @grant        GM.registerMenuCommand
 // ==/UserScript==
 
 
@@ -83,6 +86,53 @@ const commandOptions = [
     }
 
 ]
+
+// dictionary
+const promptDictionary = "請您幫我列出此單字的中文和英文以其他的詞根詞綴解釋 1. 該單字的兩個例句，例句需要包含繁體中文和英文 2. 該單字的五個vocabulary collocations用法 2. 該單字不同詞性，包含其名詞、代名詞、形容詞、動詞、副詞  3. 該單字同義詞和反義詞，單字為：";
+const setAutoFill = async () => {
+    // 隔一秒再處理，避免畫面還沒準備好
+    setTimeout(async () => {
+      const prompt = await GM.getValue("prompt", "");
+      if (prompt) {
+        // 填入 prompt
+        const textarea = document.querySelector("textarea[data-id=root]");
+        textarea.value = prompt;
+        textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  
+        const button = textarea.parentElement.querySelector(
+          "button.absolute.p-1.rounded-md.text-gray-500.bottom-1\\.5.right-1.md\\:bottom-2\\.5.md\\:right-2.hover\\:bg-gray-100.dark\\:hover\\:text-gray-400.dark\\:hover\\:bg-gray-900.disabled\\:hover\\:bg-transparent.dark\\:disabled\\:hover\\:bg-transparent"
+        );
+        button.click();
+  
+        // 清除暫存的 prompt
+        await GM.setValue("prompt", "");
+      }
+    }, 1000);
+  };
+
+const openChatGPT = async (basePrompt, text) => {
+    // 設定 prompt 並打開 ChatGPT
+    const prompt = `${basePrompt}\n\n${text}`;
+    await GM.setValue("prompt", prompt);
+    window.open("https://chat.openai.com/chat", "_blank");
+};
+
+const registerDictionary = async () => {
+    GM.registerMenuCommand(
+        "請您幫我列出此單字的中文和英文以其他的詞根詞綴解釋 1. 該單字的兩個例句，例句需要包含繁體中文和英文 2. 該單字的五個vocabulary collocations用法 2. 該單字不同詞性，包含其名詞、代名詞、形容詞、動詞、副詞  3. 該單字同義詞和反義詞，單字為：",
+        async () => {
+        const text = getSelectionText();
+
+        // 有 text 標籤才處理
+        if (text) {
+            openChatGPT(promptBaseTranslateTC, text);
+        }
+        },
+        "t"
+    );
+};
+//
+
 
 // 預設要顯示的按鈕和文字範本
 const fillAndSubmitText = (test) => {
@@ -319,8 +369,14 @@ const addSideButton = () => {
 }
 
 
-(function () {
+(async function () {
     "use strict";
+    if (location.hostname === "chat.openai.com") {
+        await setAutoFill();
+      } else {
+        await registerDictionary();
+      }
+
     // 偵測換頁必須 5 秒後才開始，因為第一次載入時可能會透過 ChatGPTAutoFill.user.js 加入預設表單內容
     setTimeout(() => {
 
