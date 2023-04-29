@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT: 外交官
 // @description  打入斜線「/」可以產生出預設的右上方指令template; 下方按鈕可以協助prompt生成; 註冊全局點擊右鍵可以的總結文章、翻譯文本prompt
-// @version      3.5.0
+// @version      3.6.0
 // @source       https://raw.githubusercontent.com/iewihc/GPTTranslateScript/main/diplomat.user.js
 // @namespace    https://github.com/iewihc/GPTTranslateScript/
 // @updateURL    https://raw.githubusercontent.com/iewihc/GPTTranslateScript/main/diplomat.user.js
@@ -215,30 +215,60 @@ const addAfterTextButtonsToSendDefaultMessage = () => {
   start();
 };
 
-const setAutoFill = async () => {
-  // 隔一秒再處理，避免畫面還沒準備好
-  setTimeout(async () => {
-    const prompt = await GM.getValue("prompt", "");
+const autoFillFromSegment = () => {
+
+    const params = new URLSearchParams(location.search);
+    const prompt = params.get('prompt'); // 'prompt'
+    const autoSubmit = params.get('autoSubmit'); // 'true'
     alert(prompt);
-    if (prompt) {
+
+
+
+  // 沒有 prompt 就不用作任何事情
+  if (!prompt) {
+    return;
+  }
+
+  /**
+   * 等待 focus 到訊息輸入框就開始初始化功能
+   */
+  const it = setInterval(() => {
+    const textarea = document.activeElement;
+    if (
+      textarea.tagName === "TEXTAREA" &&
+      textarea.nextSibling.tagName === "BUTTON" &&
+      checkCanAccess()
+    ) {
+      // 預設的送出按鈕
+      const button = textarea.parentElement.querySelector("button:last-child");
+
       // 填入 prompt
-      alert(prompt);
-
-      const textarea = document.querySelector("textarea");
-
       textarea.value = prompt;
-      textarea.dispatchEvent(new Event("input", {bubbles: true}));
+      textarea.dispatchEvent(new Event("input", { bubbles: true }));
+      textarea.focus();
+      textarea.setSelectionRange(textarea.value.length, textarea.value.length); //將選擇範圍設定為文本的末尾
+      textarea.scrollTop = textarea.scrollHeight; // 自動捲動到最下方
 
-      const button = textarea.parentElement.querySelector(
-        "button.absolute.p-1.rounded-md.text-gray-500.bottom-1\\.5.right-1.md\\:bottom-2\\.5.md\\:right-2.hover\\:bg-gray-100.dark\\:hover\\:text-gray-400.dark\\:hover\\:bg-gray-900.disabled\\:hover\\:bg-transparent.dark\\:disabled\\:hover\\:bg-transparent"
+      // auto submit
+      if (autoSubmit == "1" || autoSubmit == "true") {
+        // workaround, 還沒拿到 token 前不送出, 目前無法判斷何時取得 token, 先等一秒
+        //           setTimeout(() => {
+        button.click();
+        //           }, 1000);
+      }
+
+      // 移掉 segment 的參數
+      history.replaceState(
+        {},
+        document.title,
+        window.location.pathname + window.location.search
       );
-      button.click();
 
-      // 清除暫存的 prompt
-      await GM.setValue("prompt", "");
+      clearInterval(it);
     }
-  }, 1000);
+  }, 60);
 };
+
 
 const openChatGPT = async (basePrompt, text) => {
   // 設定 prompt 並打開 ChatGPT
@@ -526,25 +556,35 @@ const addSideButton = () => {
 
 (async function () {
   "use strict";
+
+    // 紀錄當前網址
+    var currentHref = location.href;
+
+    // 定時器回調函數
+    function checkHref() {
+        // 如果網址發生變化
+        if (location.href !== currentHref) {
+            console.log('網址發生變化了');
+            // 更新紀錄的網址
+            currentHref = location.href;
+            addSideButton();
+            addAfterTextButtonsToSendDefaultMessage();
+            addBottomButtonAndFormatting();
+        }
+    }
+
+    // 每隔 1 秒檢查一次網址是否發生變化
+    setInterval(checkHref, 1000);
+
+
   if (location.hostname === "chat.openai.com") {
-    await setAutoFill();
+    await autoFillFromSegment();
     // 偵測換頁必須 5 秒後才開始，因為第一次載入時可能會透過 ChatGPTAutoFill.user.js 加入預設表單內容
     setTimeout(async () => {
       addSideButton();
       addAfterTextButtonsToSendDefaultMessage();
       addBottomButtonAndFormatting();
-      setInterval(() => {
-      if (document.querySelector('#btn-btnDivContainer') === null) {
-        console.log('偵測到換頁事件');
-          setTimeout(() => {
-              // addSideButton();
-              // addAfterTextButtonsToSendDefaultMessage();
-              // addBottomButtonAndFormatting();
-            }, 300);
-          }
-      }, 300);
-
-    }, 4000);
+    }, 3000);
   } else {
     await registerMenu();
   }
