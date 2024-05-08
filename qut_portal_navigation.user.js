@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         QUT Portal Navigation
 // @description  New Floating Tour Button on QUT Portal Site
-// @version      1.0.0
+// @version      1.2.0
 // @source       https://raw.githubusercontent.com/iewihc/GPTTranslateScript/main/qut_portal_navigation.user.js
 // @namespace    https://github.com/iewihc/GPTTranslateScript/
 // @updateURL    https://raw.githubusercontent.com/iewihc/GPTTranslateScript/main/qut_portal_navigation.user.js
@@ -11,13 +11,12 @@
 // @run-at       document-end
 // @license      MIT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=github.com
-// @match        https://qutvirtual4.qut.edu.au/group/student/home
-// @match        https://connect.qut.edu.au
-// @match        https://canvas.qut.edu.au
-// @match        https://estudent.qut.edu.au/T1SMSAMSPRD/WebApps/eStudent/SM/StudyPlanDtls10.aspx?r=QUT.EST.STUDENT&f=QUT.EST.STUDYPLN.WEB
-// @match        https://mytimetable.qut.edu.au/even/student
-// @match        https://qutvirtual4.qut.edu.au/group/student/study/exams
-// @match        https://qutvirtual4.qut.edu.au/group/student/enrolment
+// @match        https://connect.qut.edu.au/*
+// @match        https://canvas.qut.edu.au/*
+// @match        https://estudent.qut.edu.au/*
+// @match        https://mytimetable.qut.edu.au/*
+// @match        https://qutvirtual4.qut.edu.au/*
+// @match        https://outlook.office.com/mail/
 // @grant        none
 // ==/UserScript==
 
@@ -25,12 +24,12 @@
     'use strict';
 
     const navigationItems = [
-        { text: 'EMAIL', url: 'https://connect.qut.edu.au', emoji: '📧' },
-        { text: 'CANVAS', url: 'https://canvas.qut.edu.au', emoji: '🎨' },
+        { text: 'Email', url: 'https://connect.qut.edu.au', emoji: '📧' },
+        { text: 'Canvas', url: 'https://canvas.qut.edu.au', emoji: '🎨' },
         { text: 'Study Plan', url: 'https://estudent.qut.edu.au/T1SMSAMSPRD/WebApps/eStudent/SM/StudyPlanDtls10.aspx?r=QUT.EST.STUDENT&f=QUT.EST.STUDYPLN.WEB', emoji: '📚' },
         { text: 'My Time Table', url: 'https://mytimetable.qut.edu.au/even/student', emoji: '📅' },
-        { text: 'EXAM', url: 'https://qutvirtual4.qut.edu.au/group/student/study/exams', emoji: '📝' },
-        { text: 'QUT PAY', url: 'https://qutvirtual4.qut.edu.au/group/student/enrolment', emoji: '💳' }
+        { text: 'Exam', url: 'https://qutvirtual4.qut.edu.au/group/student/study/exams', emoji: '📝' },
+        { text: 'Qut Pay', url: 'https://qutvirtual4.qut.edu.au/group/student/enrolment', emoji: '💳' }
     ];
 
     function createButton(item) {
@@ -39,13 +38,14 @@
         button.target = '_blank';
         button.style.display = 'flex';
         button.style.alignItems = 'center';
-        button.style.padding = '0.5rem';
-        button.style.margin = '0.5rem 0';
-        button.style.backgroundColor = '#3b82f6';
+        button.style.padding = '1rem';
+        button.style.margin = '0.5rem';
+        button.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
         button.style.color = 'white';
         button.style.textDecoration = 'none';
         button.style.borderRadius = '5px';
         button.style.width = '100%';
+        button.style.transition = 'background-color 0.3s';
 
         const emoji = document.createElement('span');
         emoji.innerText = item.emoji;
@@ -59,6 +59,14 @@
         text.style.textOverflow = 'ellipsis';
         button.appendChild(text);
 
+        button.addEventListener('mouseover', () => {
+            button.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+        });
+
+        button.addEventListener('mouseout', () => {
+            button.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        });
+
         return button;
     }
 
@@ -66,39 +74,58 @@
         const floatingButton = document.createElement('div');
         floatingButton.setAttribute('id', 'qut-floating-button');
         floatingButton.style.position = 'fixed';
-        floatingButton.style.bottom = '20px';
-        floatingButton.style.right = '20px';
+        floatingButton.style.bottom = '0';
+        floatingButton.style.right = '0';
         floatingButton.style.zIndex = '9999';
-        floatingButton.style.backgroundColor = 'rgba(31, 41, 55, 0.8)';
-        floatingButton.style.borderRadius = '5px';
+        floatingButton.style.backgroundColor = 'rgba(30, 64, 175, 0.9)';
+        floatingButton.style.borderRadius = '10px 0 0 0';
         floatingButton.style.padding = '10px';
-        floatingButton.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+        floatingButton.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)';
         floatingButton.style.color = 'white';
         floatingButton.style.display = 'flex';
         floatingButton.style.flexDirection = 'column';
-        floatingButton.style.alignItems = 'center';
-        floatingButton.style.width = '200px';
+        floatingButton.style.alignItems = 'flex-start';
+        floatingButton.style.width = '250px';
+        floatingButton.style.transition = 'transform 0.3s';
 
         const toggleButton = document.createElement('button');
-        toggleButton.innerHTML = '&#9776;'; // Hamburger icon
+        toggleButton.innerHTML = '&#9776; QUT Links'; // Hamburger icon and text
         toggleButton.style.border = 'none';
         toggleButton.style.background = 'none';
         toggleButton.style.color = 'white';
         toggleButton.style.cursor = 'pointer';
-        toggleButton.style.fontSize = '24px';
+        toggleButton.style.fontSize = '18px';
         toggleButton.style.fontWeight = 'bold';
         toggleButton.style.marginBottom = '10px';
+        toggleButton.style.transition = 'transform 0.3s';
 
         const optionsContainer = document.createElement('div');
         optionsContainer.style.display = 'none';
+        optionsContainer.style.width = '100%';
 
         navigationItems.forEach(item => {
             const button = createButton(item);
             optionsContainer.appendChild(button);
         });
 
+        let isOpen = false;
+
         toggleButton.addEventListener('click', () => {
-            optionsContainer.style.display = optionsContainer.style.display === 'none' ? 'block' : 'none';
+            isOpen = !isOpen;
+            optionsContainer.style.display = isOpen ? 'block' : 'none';
+            floatingButton.style.width = isOpen ? '250px' : '150px';
+        });
+
+        floatingButton.addEventListener('mouseover', () => {
+            if (!isOpen) {
+                floatingButton.style.transform = 'translateX(-10px)';
+            }
+        });
+
+        floatingButton.addEventListener('mouseout', () => {
+            if (!isOpen) {
+                floatingButton.style.transform = 'translateX(0)';
+            }
         });
 
         floatingButton.appendChild(toggleButton);
