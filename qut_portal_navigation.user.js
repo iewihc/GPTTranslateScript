@@ -10,7 +10,6 @@
 // @author       Leon
 // @run-at       document-end
 // @license      MIT
-// @match        https://claude.ai/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=github.com
 // @match        https://qutvirtual4.qut.edu.au/group/student/home
 // @match        https://connect.qut.edu.au
