@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name         Claude: 外交官
-// @description  基礎功能(快速翻譯文本)
+// @name         QUT Portal Navigation
+// @description  New Floating Tour Button on QUT Portal Site
 // @version      4.7.9
 // @source       https://raw.githubusercontent.com/iewihc/GPTTranslateScript/main/qut_portal_navigation.user.js
 // @namespace    https://github.com/iewihc/GPTTranslateScript/
 // @updateURL    https://raw.githubusercontent.com/iewihc/GPTTranslateScript/main/qut_portal_navigation.user.js
 // @downloadURL  https://raw.githubusercontent.com/iewihc/GPTTranslateScript/main/qut_portal_navigation.user.js
 // @website      https://fullstackladder.dev/
-// @author       Chi-Wei Lin
+// @author       Leon
 // @run-at       document-end
 // @license      MIT
 // @match        https://claude.ai/*
