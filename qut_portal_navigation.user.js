@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         QUT Portal Navigation
 // @description  New Floating Tour Button on QUT Portal Site
-// @version      4.7.9
+// @version      1.0.0
 // @source       https://raw.githubusercontent.com/iewihc/GPTTranslateScript/main/qut_portal_navigation.user.js
 // @namespace    https://github.com/iewihc/GPTTranslateScript/
 // @updateURL    https://raw.githubusercontent.com/iewihc/GPTTranslateScript/main/qut_portal_navigation.user.js
